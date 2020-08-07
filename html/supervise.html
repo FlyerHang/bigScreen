@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>金华市服务业亩产效益智能大屏</title>
+	<link rel="stylesheet" type="text/css" href="../css/supervise.css">
+	<link rel="stylesheet" href="//cdn.bootcss.com/layer/3.0.1/skin/default/layer.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+	<script type="text/javascript" src="https://lib.baomitu.com/echarts/4.7.0/echarts.min.js"></script>
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="http://lib.sinaapp.com/js/jquery/3.1.0/jquery-3.1.0.min.js"></script>
+	<script src="//cdn.bootcss.com/layer/3.0.1/layer.min.js"></script>
+	<script type="text/javascript" src="../js/joggle.js"></script>
+</head>
+<body>
+	<div id="supervise" v-cloak>
+		<div class="header">
+			<img src="../img/head_2.png">
+			<div class="selNav">
+				<span @click="navSel()">{{selNavName}}<img src="../img/nav.png"></span>
+				<ul class="selnavBox" v-if="pageChange">
+					<li v-for="(list,index) in navList" :class="list.id==selNavId?'select':''" @click="pageTogo(list.url)">{{list.name}}</li>
+				</ul>
+			</div>
+		</div>
+		<div class="main" ref="main">
+			<div class="neck">
+				<div class="mainTitle"><img src="../img/icon_13.png"><span>全市服务业企业概况</span></div>
+				<ul class="totalList">
+					<li>
+						<div class="blue">10000</div>
+						<div>工商注册企业数量（含个体）</div>
+						<div class="gary">(家)</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>税务入库企业数量</div>
+						<div class="gary">(家)</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>规上企业数量</div>
+						<div class="gary">(家)</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>限上企业数量</div>
+						<div class="gary">(家)</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>增加值</div>
+						<div class="gary">(万元)</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>税收实际贡献</div>
+						<div class="gary">（万元）</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>规上企业营收</div>
+						<div class="gary">(万元)</div>
+					</li>
+					<li>
+						<div class="blue">10000</div>
+						<div>限上企业营收</div>
+						<div class="gary">(万元)</div>
+					</li>
+				</ul>
+			</div>
+			<div class="container">
+				<div class="conLeft">
+					<div class="mainTitle"><img src="../img/icon_14.png"><span>服务业经济运行监测</span></div>
+					<ul class="quarter">
+						<li :class="selNavIndex==0?'select':''" @click="selNavIndex=0">第一季度</li>
+						<li :class="selNavIndex==1?'select':''" @click="selNavIndex=1">第二季度</li>
+						<li :class="selNavIndex==2?'select':''" @click="selNavIndex=2">第三季度</li>
+						<li :class="selNavIndex==3?'select':''" @click="selNavIndex=3">第四季度</li>
+					</ul>
+					<ul class="totalNum">
+						<li>
+							<div class="leftOne"><span>589</span></div>
+							<div>新增注册企业数量</div>
+							<div class="gary">（家）</div>
+						</li>
+						<li>
+							<div class="leftTwo"><span>92</span></div>
+							<div>注销企业数量 </div>
+							<div class="gary">（家）</div>
+						</li>
+						<li>
+							<div class="leftThree"><span>9.62</span></div>
+							<div>增加值</div>
+							<div class="gary">（万元）</div>
+						</li>
+						<li>
+							<div class="leftFour"><span>1.37</span></div>
+							<div>规上企业应收</div>
+							<div class="gary">（万元）</div>
+						</li>
+						<li>
+							<div class="leftFive"><span>0.79</span></div>
+							<div>限上企业营收</div>
+							<div class="gary">（万元）</div>
+						</li>
+					</ul>
+					<div class="lefteEchart" ref="leftEchart">
+
+					</div>
+				</div>
+				<div class="conRight">
+					<div class="rightTop">
+						<div class="mainTitle"><img src="../img/icon_15.png"><span>全省各地市指标对比</span></div>
+						<div class="rightTopEchart" ref="rightTopEchart">
+
+						</div>
+					</div>
+					<div class="rightBottom">
+						<div class="mainTitle"><img src="../img/icon_16.png"><span>各县市指标对比</span></div>
+						<div class="rightBottomEchart" ref="rightBottomEchart">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="../js/supervise.js"></script>
+</body>
+</html>

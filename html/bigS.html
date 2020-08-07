@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>金华市服务业亩产效益智能大屏</title>
+	<link rel="stylesheet" type="text/css" href="../css/bigS.css">
+	<link rel="stylesheet" href="//cdn.bootcss.com/layer/3.0.1/skin/default/layer.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+	<script type="text/javascript" src="https://lib.baomitu.com/echarts/4.7.0/echarts.min.js"></script>
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="http://lib.sinaapp.com/js/jquery/3.1.0/jquery-3.1.0.min.js"></script>
+	<script src="//cdn.bootcss.com/layer/3.0.1/layer.min.js"></script>
+	<script type="text/javascript" src="//api.map.baidu.com/api?type=webgl&v=3.01&ak=amoKc1649OD7htSEyOlFhDSdQuIzdOWh"></script>
+	<script type="text/javascript" src="../js/joggle.js"></script>
+	<script type="text/javascript" src="../js/mapStyle.js"></script>
+</head>
+<body>
+	<div id="bigS" v-cloak>
+		<div class="header">
+			<img src="../img/head.png">
+			<div class="selNav">
+				<span @click="navSel()">{{selNavName}}<img src="../img/nav.png"></span>
+				<ul class="selnavBox" v-if="pageChange">
+					<li v-for="(list,index) in navList" :class="list.id==selNavId?'select':''" @click="pageTogo(list.url)">{{list.name}}</li>
+				</ul>
+			</div>
+		</div>
+		<div id="allMap" ref="allMap"></div>
+		<div id="main" ref="main">
+			<div class="mainLeft">
+				<div class="echartBox">
+					<div class="mainTitle"><img src="../img/icon_1.png"><span>亩产效益综合评价</span></div>
+					<div class="mainSel">
+						<span :class="echartType=='A'?'selected':''" @click="echartChange('A')">A类企业</span>
+						<span :class="echartType=='B'?'selected':''" @click="echartChange('B')">B类企业</span>
+						<span :class="echartType=='C'?'selected':''" @click="echartChange('C')">C类企业</span>
+						<span :class="echartType=='D'?'selected':''" @click="echartChange('D')">D类企业</span>
+					</div>
+					<div class="echartShow" ref="echartShow">
+						
+					</div>
+				</div>
+				<div class="gdp">
+					<div class="mainTitle"><img src="../img/icon_2.png"><span>规上企业总量经济指标</span></div>
+					<div class="mainSel">
+						<span :class="gdpType=='all'?'selected':''" @click="gdpChange('all')">全部规上企业</span>
+						<span :class="gdpType=='have'?'selected':''" @click="gdpChange('have')">自有土地企业</span>
+						<span :class="gdpType=='nohave'?'selected':''" @click="gdpChange('nohave')">非自有土地企业</span>
+					</div>
+					<ul class="mainList">
+						<li>
+							<div class="spanRight">
+								<span>企业数量（家）</span>
+								<span class="right">{{economicShowList.QYSL}}</span>
+							</div>
+							<div class="rule colorOne"></div>
+						</li>
+						<li>
+							<div class="spanRight">
+								<span>增加值（万元）</span>
+								<span class="right">{{economicShowList.ZJZ}}</span>
+							</div>
+							<div class="rule colorTwo"></div>
+						</li>
+						<li>
+							<div class="spanRight">
+								<span>营业收入（万元）</span>
+								<span class="right">{{economicShowList.YYSR}}</span>
+							</div>
+							<div class="rule colorThree"></div>
+						</li>
+						<li>
+							<div class="spanRight">
+								<span>就业人数（人）</span>
+								<span class="right">{{economicShowList.ZGRS}}</span>
+							</div>
+							<div class="rule colorFour"></div>
+						</li>
+						<li>
+							<div class="spanRight">
+								<span>税收实际贡献（万元）</span>
+								<span class="right">{{economicShowList.SJSS}}</span>
+							</div>
+							<div class="rule colorFive"></div>
+						</li>
+						<li>
+							<div class="spanRight">
+								<span>实际用地面积（亩）</span>
+								<span class="right">{{economicShowList.TDMJ}}</span>
+							</div>
+							<div class="rule colorSix"></div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="mainCenter">
+				<div class="centerTop">
+					<ul>
+						<li>
+							<div>{{totalList.QYSL}}</div>
+							<div>企业数量</div>
+							<div>(家)</div>
+						</li>
+						<li>
+							<div>{{totalList.SJSS}}</div>
+							<div>税收实际贡献</div>
+							<div>(万元)</div>
+						</li>
+						<li>
+							<div>{{totalList.ZJZ}}</div>
+							<div>增加值</div>
+							<div>(万元)</div>
+						</li>
+						<li>
+							<div>{{totalList.YYSR}}</div>
+							<div>营业收入</div>
+							<div>(万元)</div>
+						</li>
+						<li>
+							<div>{{totalList.ZGRS}}</div>
+							<div>就业贡献</div>
+							<div>(人)</div>
+						</li>
+						<li>
+							<div>{{totalList.YFTR}}</div>
+							<div>研发投入</div>
+							<div>(万元)</div>
+						</li>
+						<li>
+							<div>{{totalList.TDMJ}}</div>
+							<div>实际用地面积</div>
+							<div>(亩)</div>
+						</li>
+						<li>
+							<div>{{totalList.TDMJ_PF}}</div>
+							<div>建筑面积</div>
+							<div>(万m2)</div>
+						</li>
+					</ul>
+				</div>
+				<div class="centerBottom">
+					<ul>
+						<li :class="mapShowType=='A'?'select':''" @click="mapChange('A')">
+							<img src="../img/mark_1.png">
+							<span>A类企业（{{totalList.QYSL_A}}）</span>
+						</li>
+						<li :class="mapShowType=='B'?'select':''" @click="mapChange('B')">
+							<img src="../img/mark_2.png">
+							<span>B类企业（{{totalList.QYSL_B}}）</span>
+						</li>
+						<li :class="mapShowType=='C'?'select':''" @click="mapChange('C')">
+							<img src="../img/mark_3.png">
+							<span>C类企业（{{totalList.QYSL_C}}）</span>
+						</li>
+						<li :class="mapShowType=='D'?'select':''" @click="mapChange('D')">
+							<img src="../img/mark_4.png">
+							<span>D类企业（{{totalList.QYSL_D}}）</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="mainRight">
+				<div class="merits">
+					<div class="mainTitle"><img src="../img/icon_3.png"><span>规上企业亩均绩效指标</span></div>
+					<div class="mainSel">
+						<span :class="meritsType=='all'?'selected':''" @click="meritsChange('all')">全部规上企业</span>
+						<span :class="meritsType=='have'?'selected':''" @click="meritsChange('have')">自有土地企业</span>
+						<span :class="meritsType=='nohave'?'selected':''" @click="meritsChange('nohave')">非自有土地企业</span>
+					</div>
+					<div class="meritsList">
+						<div class="listF">
+							<div>
+								<div>{{achieShowList.QJ_YYSR}}</div>
+								<div>企均营业收入</div>
+								<div>(万元/家)</div>
+							</div>
+							<div>
+								<div>{{achieShowList.QJ_ZGRS}}</div>
+								<div>企均就业人数</div>
+								<div>(人/家)</div>
+							</div>
+							<div>
+								<div>{{achieShowList.QJ_SJSS}}</div>
+								<div>企均税收</div>
+								<div>(万元/家)</div>
+							</div>
+							<div>
+								<div>{{achieShowList.MJ_SJSS}}</div>
+								<div>亩均税收</div>
+								<div>(万元/亩)</div>
+							</div>
+						</div>
+						<div class="listF">
+							<div>
+								<div>{{achieShowList.MJ_YYSR}}</div>
+								<div>亩均营业收入</div>
+								<div>(万元/家)</div>
+							</div>
+							<div>
+								<div>{{achieShowList.MJ_ZJZ}}</div>
+								<div>亩均增加值</div>
+								<div>(万元/家)</div>
+							</div>
+							<div>
+								<div>{{achieShowList.LDSCL}}</div>
+								<div>全员劳动生产率</div>
+								<div>(万元/家)</div>
+							</div>
+							<div>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="benefit">
+					<div class="mainTitle"><img src="../img/icon_4.png"><span>规下（下线）企业效益</span></div>
+					<div class="benTitle">亩均指标</div>
+					<div class="benList">
+						<div>
+							<div id="circleL">
+								<div v-if="enterpriseList.MJ_SJSS>=0">{{enterpriseList.MJ_SJSS}}</div>
+								<div v-else>-</div>
+								<div>万元/亩</div>
+							</div>
+							<div class="circleLT">亩均税收</div>
+						</div>
+						<div>
+							<div id="circleR">
+								<div v-if="enterpriseList.MJ_YYSR>=0">{{enterpriseList.MJ_YYSR}}</div>
+								<div v-else>-</div>
+								<div>万元/亩</div>
+							</div>
+							<div class="circleRT">亩均营业收入</div>
+						</div>
+					</div>
+					<div class="benTitle">总量指标</div>
+					<ul class="benTotal">
+						<li>
+							<div>{{enterpriseList.QYSL}}</div>
+							<div>企业数量</div>
+							<div>(家)</div>
+						</li>
+						<li>
+							<div>{{enterpriseList.SJSS}}</div>
+							<div>税收实际贡献</div>
+							<div>(万元)</div>
+						</li>
+						<li>
+							<div>{{enterpriseList.YYSR}}</div>
+							<div>营业收入</div>
+							<div>(万元)</div>
+						</li>
+						<li>
+							<div>{{enterpriseList.TDMJ}}</div>
+							<div>实际用地面积</div>
+							<div>(亩)</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="../js/bigS.js"></script>
+</body>
+</html>

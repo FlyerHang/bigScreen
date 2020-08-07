@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>行业（产业）绩效分析</title>
+	<link rel="stylesheet" type="text/css" href="../css/trade.css">
+	<script src="http://lib.sinaapp.com/js/jquery/3.1.0/jquery-3.1.0.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+	<script type="text/javascript" src="https://lib.baomitu.com/echarts/4.7.0/echarts.min.js"></script>
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="//cdn.bootcss.com/layer/3.0.1/layer.min.js"></script>
+	<link rel="stylesheet" href="//cdn.bootcss.com/layer/3.0.1/skin/default/layer.css">
+</head>
+<body>
+	<div id="trade" v-cloak>
+		<div class="header">
+			<img src="../img/head_4.png">
+			<div class="selNav">
+				<span @click="navSel()">{{selNavName}}<img src="../img/nav.png"></span>
+				<ul class="selnavBox" v-if="pageChange">
+					<li v-for="(list,index) in navList" :class="list.id==selNavId?'select':''" @click="pageTogo(list.url)">{{list.name}}</li>
+				</ul>
+			</div>
+		</div>
+		<div class="main" ref="main">
+			<div class="mainLeft">
+				<div class="echartBox">
+					<div class="mainTitle"><img src="../img/icon_9.png"><span>各行业（产业）总量指标对比图</span></div>
+					<div class="mainSel">
+						<span :class="barType=='trade'?'selected':''" @click="barChange('trade',0)">行业</span>
+						<span :class="barType=='estate'?'selected':''" @click="barChange('estate',1)">产业</span>
+					</div>
+					<div class="mainSelect">
+						<div class="chooseBox1">
+							<span @click="leftChoose()">{{selTotalName}}</span>
+							<img src="../img/downL.png" alt="">
+							<ul v-if="leftChooseShow">
+								<li v-for="(list,index) in totalName" :class="list.ZBID==selTotalId?'select':''" @click="selTotalThis(list.ZBID,list.ZBMC,index)">
+									{{list.ZBMC}}
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="echartShow" ref="leftEchart">
+						
+					</div>
+				</div>
+			</div>
+			<div class="mainCenter">
+				<div class="mainTop">
+					<div class="leftTop">
+						<div class="mainTitle"><img src="../img/icon_8.png"><span>各产业指标对比图</span>
+							<!-- <div class="mainSel small">
+								<span :class="ratioType=='have'?'selected':''" @click="ratioChange('have',0)">自有土地企业</span>
+								<span :class="ratioType=='nohave'?'selected':''" @click="ratioChange('nohave',1)">非自有土地企业</span>
+								<span :class="ratioType=='under'?'selected':''" @click="ratioChange('under',2)">规下企业</span>
+							</div> -->
+							<div class="mainSelect small">
+								<div class="chooseBox1">
+									<span @click="rightChoose()">{{selMeritsName}}</span>
+									<img src="../img/downL.png" alt="">
+									<ul v-if="rightChooseShow">
+										<li v-for="(list,index) in meritsName" :class="list.ZBID==selMeritsId?'select':''" @click="selMeritsThis(list.ZBID,list.ZBMC,index)">
+											{{list.ZBMC}}
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						
+						<div class="leftEchartBox" ref="leftEchartBox">
+
+						</div>
+					</div>
+					<div class="mainRule"></div>
+					<div class="centerTop">
+						<div class="mainTitle">
+							<img src="../img/icon_10.png"><span>各行业（产业）不同性质土地企业对比</span>
+							<div class="mainSel cenTop">
+								<span :class="landType=='trade'?'selected':''" @click="landChange('trade',0)">行业</span>
+								<span :class="landType=='estate'?'selected':''" @click="landChange('estate',1)">产业</span>
+							</div>
+						</div>
+						<div class="chooseBox">
+							<div class="choose">
+								<span @click="chooseShow()">{{selLandName}}</span>
+								<img src="../img/downL.png" alt="">
+								<ul v-if="chooseListShow">
+									<li v-for="(list,index) in landOptions" :class="list.ZBID==selLandZBID?'select':''" @click="selLandThis(list.ZBID,list.ZBMC,index)">
+										{{list.ZBMC}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="barShow" ref="barShow">
+							
+						</div>
+					</div>
+				</div>
+				<div class="centerBottom">
+					<div class="mainTitle">
+						<img src="../img/icon_11.png"><span>各（产业）规上企业指标数据汇总对比</span>
+					</div>
+					<div class="mainSel">
+						<span :class="listType=='all'?'selected':''" @click="listChange('all',0)">全部规上企业</span>
+						<span :class="listType=='have'?'selected':''" @click="listChange('have',1)">自有土地企业</span>
+						<span :class="listType=='nohave'?'selected':''" @click="listChange('nohave',2)">非自有土地企业</span>
+					</div>
+					<!-- <div class="screen">
+						<select name="screenList" id="">
+							<option value="1">增加量</option>
+						</select>
+						<button class="export">导出数据</button>
+					</div> -->
+					<div class="screenList">
+						<ul class="listHead">
+							<li>排名</li>
+							<li>所属产业</li>
+							<li class="cursor" :class="'QYSL'==sortName?'select':''" @click="downSort('QYSL')">企业数量</li>
+							<li class="cursor" :class="'YYSR'==sortName?'select':''" @click="downSort('YYSR')">营业收入</li>
+							<li class="cursor" :class="'ZJZ'==sortName?'select':''" @click="downSort('ZJZ')">增加值</li>
+							<li class="cursor" :class="'SJSS'==sortName?'select':''" @click="downSort('SJSS')">税收实际贡献</li>
+							<li class="cursor" :class="'ZGRS'==sortName?'select':''" @click="downSort('ZGRS')">就业人数</li>
+							<li class="cursor" :class="'QJ_YYSR'==sortName?'select':''" @click="downSort('QJ_YYSR')">企均营业收入</li>
+							<li class="cursor" :class="'QJ_ZGRS'==sortName?'select':''" @click="downSort('QJ_ZGRS')">企均就业人数</li>
+							<li class="cursor" :class="'QJ_SJSS'==sortName?'select':''" @click="downSort('QJ_SJSS')">企均税收</li>
+							<li class="cursor" :class="'MJ_SJSS'==sortName?'select':''" @click="downSort('MJ_SJSS')">亩均税收</li>
+							<li class="cursor" :class="'MJ_YYSR'==sortName?'select':''" @click="downSort('MJ_YYSR')">亩均营业收入</li>
+							<li class="cursor" :class="'MJ_ZJZ'==sortName?'select':''" @click="downSort('MJ_ZJZ')">亩均增加值</li>
+							<li class="cursor" :class="'LDSCL'==sortName?'select':''" @click="downSort('LDSCL')">全员劳动生产率</li>
+						</ul>
+						<ul v-for="(list,index) in aggreShowList">
+							<li v-if="index==0"><img src="../img/first.png" alt=""></li>
+							<li v-else-if="index==1"><img src="../img/second.png" alt=""></li>
+							<li v-else-if="index==2"><img src="../img/thrid.png" alt=""></li>
+							<li v-else>{{index+1}}</li>
+							<li class="areaName" :title="list.HYMC">{{list.HYMC}}</li>
+							<li>{{list.QYSL}}</li>
+							<li>{{list.YYSR}}</li>
+							<li>{{list.ZJZ}}</li>
+							<li>{{list.SJSS}}</li>
+							<li>{{list.ZGRS}}</li>
+							<li>{{list.QJ_YYSR}}</li>
+							<li>{{list.QJ_ZGRS}}</li>
+							<li>{{list.QJ_SJSS}}</li>
+							<li>{{list.MJ_SJSS}}</li>
+							<li>{{list.MJ_YYSR}}</li>
+							<li>{{list.MJ_ZJZ}}</li>
+							<li>{{list.LDSCL}}</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- <div class="mainRight">
+				<div class="echartBox">
+					<div class="mainTitle"><img src="../img/icon_12.png"><span>各行业（产业）指标对比图</span></div>
+					<div class="mainSel">
+						<span :class="ratioType=='trade'?'selected':''" @click="ratioChange('trade',0)">行业</span>
+						<span :class="ratioType=='estate'?'selected':''" @click="ratioChange('estate',1)">产业</span>
+					</div>
+					<div class="mainSelect">
+						<div class="chooseBox1">
+							<span @click="rightChoose()">{{selMeritsName}}</span>
+							<img src="../img/downL.png" alt="">
+							<ul v-if="rightChooseShow">
+								<li v-for="(list,index) in meritsName" :class="list.ZBID==selMeritsId?'select':''" @click="selMeritsThis(list.ZBID,list.ZBMC,index)">
+									{{list.ZBMC}}
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="echartShow" ref="rightEchart">
+						
+					</div>
+				</div>
+			</div> -->
+		</div>
+	</div>
+	<script type="text/javascript" src="../js/joggle.js"></script>
+	<script type="text/javascript" src="../js/trade.js"></script>
+</body>
+</html>

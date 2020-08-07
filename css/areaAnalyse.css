@@ -1,0 +1,377 @@
+html,body,div,ul,li{
+	margin: 0;
+	padding: 0;
+}
+ul,li{
+	list-style: none;
+}
+html,body{
+	width: 100%;
+	height: 100%
+}
+#areaAnalyse{
+	height: 100%;
+	width: 100%;
+	color: #fff;
+}
+[v-cloak]{
+	display: none;
+}
+.header{
+	position: relative;
+	width: 100%;
+	height: 80px;
+	background: #22779b;
+}
+.header>img{
+	width: 100%;
+	height: 100%;
+}
+.main{
+	display: flex;
+	padding: 20px;
+	min-height: 800px;
+	background: #37c4ff;
+	box-shadow: inset 0px 150px 150px -50px #072531;
+}
+.mainLeft,.mainRight{
+	width: 26%;
+}
+.mainCenter{
+	position: relative;
+	width: 76%;
+	padding: 0 0 0 20px;
+}
+.echartBox{
+	font-size: 14px;
+	padding: 15px;
+	border: 1px solid #34c3ff;
+	background: #043c53;
+	/* background: rgba(001,029,040,0.8); */
+	box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.8);
+}
+.mainTitle{
+	font-size: 14px;
+}
+.mainTitle>img{
+	position: relative;
+	width: 40px;
+	height: 25px;
+	top: 5px;
+}
+.mainTitle>span{
+	display: inline-block;
+	line-height: 30px;
+	margin-left: 10px;
+}
+.mainSel{
+	margin-top: 20px;
+	display: flex;
+}
+.mainSel>span{
+	width: 100%;
+	text-align: center;
+	line-height: 40px;
+	background: #011D28;
+	border-radius: 4px;
+	font-size: 14px;
+	cursor: pointer;
+}
+.mainSel>span.selected{
+	background: #004969;
+	border:1px solid #34c3ff;
+	box-shadow: 0px 0px 3px 0px rgba(255,255,255,0.5); 
+}
+.mainSel>span{
+	border: 1px solid #0d2274;
+}
+.echartShow{
+	height: 590px;
+	margin-top: 20px;
+	padding-bottom: 29px;
+}
+.centerTop,.leftTop{
+	font-size: 14px;
+	padding: 15px;
+	border: 1px solid #34c3ff;
+	background: #043c53;
+	/* background: rgba(001,029,040,0.8); */
+	box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.8);
+}
+#landType{
+	float: right;
+	width: 120px;
+	height: 36px;
+	line-height: 36px;
+	background: #0f4f68;
+	color: #fff;
+	border-radius: 5px;
+}
+#barType{
+	width: 100%;
+	margin-top: 15px;
+	height: 40px;
+	line-height: 40px;
+	border-radius: 5px;
+	background: #0f4f68;
+	color: #fff;
+}
+#barType>option{
+	height: 40px;
+}
+.barShow{
+	height: 200px;
+	margin-top: 15px;;
+}
+.centerBottom{
+	margin-top: 20px;
+	padding: 15px;
+	background: #043c53;
+	/* background: rgba(001,029,040,0.8); */
+}
+.screen{
+	padding: 15px 0;
+}
+.screen>select{
+	width: 150px;
+	height: 34px;
+}
+.screen>button{
+	float:right;
+}
+.screenList{
+	padding: 10px 0 0 0;
+}
+.screenList>ul{
+	display: flex;
+	font-size: 12px;
+	border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.screenList>ul>li{
+	display: flex;
+	width:100%;
+	padding: 5px;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+.screenList>ul>li.select{
+	background: #011d28;
+}
+.screenList>ul>li.areaName{
+	display: inline-block;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+}
+.screenList>ul>li>img{
+	width: 22px;
+	height: 22px;
+}
+.screenList>ul:not(:first-child)>li{
+	height: 20px;
+	line-height: 20px;
+}
+.screenList>ul.listHead{
+	background: rgba(255,255,255,0.2);
+	border-bottom: 0px;
+}
+.screenList>ul.listHead>li{
+	display: flex;
+	height: 30px;
+    width: 100%;
+    padding: 5px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.choose{
+	position: relative;
+	float: right;
+	width: 150px;;
+	margin-right: 10px;
+}
+.choose>span{
+	display: inline-block;
+	width: 150px;
+	height: 36px;
+	padding-left: 10px;
+	line-height: 36px;
+	border-radius: 3px;
+	background: #3c748b;
+	color: #34b9f1;
+	cursor: pointer;
+}
+.choose>img{
+	position: absolute;
+	height: 6px;
+	width: 12px;
+	right: 5px;
+	top: 15px;
+}
+.choose>ul{
+	position: absolute;
+	width: 160px;
+	top: 36px;
+	left: 0;
+	background: #004969;
+	border-radius: 4px;;
+	z-index: 10;
+	border:1px solid #37d2e7;
+}
+.choose>ul>li{
+	height: 36px;
+	line-height: 36px;
+	padding-left: 10px;
+	cursor: pointer;
+}
+.choose>ul>li.select{
+	background: #386579;
+}
+.choose>ul>li:hover{
+	/* background: #386579; */
+	color: #34c3ff;
+}
+.mainSelect{
+	margin-top: 15px;
+}
+.chooseBox1{
+	position: relative;
+	padding-left: 10px;
+	background: rgba(255,255,255,0.2);
+	border-radius: 4px;
+}
+.chooseBox1>span{
+	display: inline-block;
+	width: 100%;
+	height: 40px;
+	line-height: 40px;
+	color: #34b9f1;
+	cursor: pointer;
+}
+.chooseBox1>ul{
+	position: absolute;
+	width: 100%;
+	top: 40px;
+	left: 0;
+	background: #004969;
+	border-radius: 4px;
+	z-index: 10;
+	border:1px solid #37d2e7;
+}
+.chooseBox1>ul>li{
+	height: 36px;
+	line-height: 36px;
+	cursor: pointer;
+	padding-left: 10px;
+	text-align: left;
+	font-size: 12px;
+}
+.chooseBox1>ul>li.select{
+	background: #386579;
+}
+.chooseBox1>ul>li:hover{
+	/* background: #386579; */
+	color: #34c3ff;
+}
+.chooseBox1>img{
+	position: absolute;
+	height: 6px;
+	width: 12px;
+	right: 10px;
+	top: 18px;
+}
+.cursor{
+	cursor: pointer;
+}
+.mainTop{
+	display: flex;
+}
+.mainTop>div{
+	width: 50%;
+}
+.mainTop>div.mainRule{
+	width: 20px;
+}
+.mainSel.small{
+	width: 50%;
+	float: right;
+	font-size: 12px;
+	margin-top: 0;
+}
+.mainSel.small>span{
+	height: 26px;
+	line-height: 26px;
+	font-size: 12px;
+}
+.mainSelect.small{
+	text-align: right;
+}
+.mainSelect.small>.chooseBox1{
+	display: inline-block;
+	width: 28%;
+}
+.mainSelect.small>.chooseBox1>span{
+	height: 30px;
+	line-height: 30px;
+	text-align: left;
+}
+.mainSelect.small>.chooseBox1>img{
+	top:11px;
+}
+.mainSelect.small>.chooseBox1>ul{
+	top: 30px;
+}
+.leftEchartBox{
+	height: 170px;
+}
+.selNav{
+	position: absolute;
+	right: 50px;
+	top: 55px;
+	font-size: 12px;
+	/* background: #0a3a48; */
+}
+.selNav>span{
+	position: relative;
+	display: inline-block;
+	width: 150px;
+	color: #fcb346;
+	padding: 10px 20px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+.selNav>span>img{
+	margin-left: 10px;
+}
+.selnavBox{
+	position: absolute;
+	top: 32px;
+	left: 0;
+	padding-bottom: 10px;
+	z-index: 100;
+	background: #0a3a48;
+	border-radius: 5px;
+	border: 1px solid #34c3ff;
+	box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.8);
+}
+.selnavBox>li{
+	width: 150px;
+	padding: 10px 20px;
+	cursor: pointer;
+	border-radius: 1px solid #004763;
+}
+.selnavBox>li.select{
+	color: #fcb346;
+}
+.selnavBox>li:hover{
+	color: #fcb346;
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>金华市服务业亩产效益智能大屏</title>
+	<link rel="stylesheet" type="text/css" href="../css/portraits.css">
+	<link rel="stylesheet" href="//cdn.bootcss.com/layer/3.0.1/skin/default/layer.css">
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+	<script type="text/javascript" src="https://lib.baomitu.com/echarts/4.7.0/echarts.min.js"></script>
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="http://lib.sinaapp.com/js/jquery/3.1.0/jquery-3.1.0.min.js"></script>
+	<script src="//cdn.bootcss.com/layer/3.0.1/layer.min.js"></script>
+	<script type="text/javascript" src="../js/joggle.js"></script>
+</head>
+<body>
+	<div id="portraits" v-cloak>
+		<div class="header">
+			<img src="../img/head_5.png">
+			<div class="selNav">
+				<span @click="navSel()">{{selNavName}}<img src="../img/nav.png"></span>
+				<ul class="selnavBox" v-if="pageChange">
+					<li v-for="(list,index) in navList" :class="list.id==selNavId?'select':''" @click="pageTogo(list.url)">{{list.name}}</li>
+				</ul>
+			</div>
+		</div>
+		<div class="main" ref="main">
+			<div class="mainLeft">
+                <div class="title">高级搜索</div>
+                <ul class="searchList">
+                    <li>
+                        <input type="text" placeholder="请输入企业名单" v-model="comName">
+                    </li>
+                    <li class="big">
+                        <div class="choose">
+                            <span @click="areaShow=!areaShow">{{areaName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <ul v-if="areaShow">
+                                <li v-for="(list,index) in areaList" :class="list.ID==areaIndex?'select':''" @click="areaChange(list.ID,list.VALUE,list.SJLX)">
+                                    {{list.VALUE}}
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="small">
+                        <div class="chooseLeft">
+                            <span @click="cyShow=!cyShow">{{cyName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <ul v-if="cyShow">
+                                <li v-for="(list,index) in chyList" :class="list.Id==cyIndex?'select':''" @click="cyChange(list.Id,list.Name)">
+                                    {{list.Name}}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="chooseRight">
+                            <span @click="cyCShow=!cyCShow">{{cyCName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <ul v-if="cyCShow">
+                                <li v-for="(list,index) in chyListShow" :class="list.ID==cyCIndex?'select':''" @click="cyCChange(list.ID,list.VALUE)">
+                                    {{list.VALUE}}
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="small">
+                        <div class="chooseLeft">
+                            <span @click="otherShow=!otherShow">{{otherName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <ul v-if="otherShow">
+                                <li :class="'YYSR'==otherIndex?'select':''" @click="otherChange('YYSR','营业收入')">
+                                    营收规模
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="chooseRight">
+                            <span @click="otherCShow=!otherCShow">{{otherCName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <ul v-if="otherCShow">
+                                <li v-for="(list,index) in otherList" :class="list.ID==otherCIndex?'select':''" @click="otherCChange(list.ID,list.VALUE)">
+                                    {{list.VALUE}}
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="big">
+                        <div class="choose">
+                            <span @click="tdShow=!tdShow">{{tdName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <!-- <ul v-if="tdShow">
+                                <li v-for="(list,index) in 3" :class="index==tdIndex?'select':''" @click="tdChange(index,'非自有')">
+                                    非自有
+                                </li>
+                            </ul> -->
+                        </div>
+                    </li>
+                    <li class="big">
+                        <div class="choose">
+                            <span @click="pfShow=!pfShow">{{pfName}}</span>
+                            <img src="../img/downL.png" alt="">
+                            <!-- <ul v-if="pfShow">
+                                <li v-for="(list,index) in otherList" :class="list.ID==pfIndex?'select':''" @click="pfChange(list.ID,list.VALUE)">
+                                    {{list.VALUE}}
+                                </li>
+                            </ul> -->
+                        </div>
+                    </li>
+                </ul>
+                <div class="btnBox">
+                    <button class="cancel" @click="clearAll()">清空</button>
+                    <button class="search" @click="submitAll()">查询</button>
+                </div>
+            </div>
+            <div class="mainRight">
+                <div class="mainTitle">
+                    <img src="../img/icon_17.png"><span>企业基本信息</span>
+                    <button class="search">导出数据</button>
+                </div>
+                <div class="comList">
+                    <table rules=none>
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>公司名称</th>
+                                <th>统一社会信用代码</th>
+                                <th>所属产业</th>
+                                <th>当年度评价结果</th>
+                                <th>上年度评价结果</th>
+                                <th>土地使用性质</th>
+                                <th>当年年度参评面积</th>
+                                <th>税金实际贡献（万元）</th>
+                                <th>营业收入（万元）</th>
+                                <th>利润总额（万元）</th>
+                                <th>增加值（万元）</th>
+                                <th>年平均职工数（人）</th>
+                                <th>社保人数（人）</th>
+                                <th>研发经费投入（万元）</th>
+                                <th>研发人数</th>
+                                <th>有效发明专利数</th>
+                                <th>税收实际贡献度</th>
+                                <th>亩均税收（万元/亩）</th>
+                                <th>亩均增加值（万元/亩）</th>
+                                <th>亩均营业收入（万元/亩）</th>
+                                <th>就业贡献度</th>
+                                <th>全员生产率（万元/人）</th>
+                                <th>研发投入占比（%）</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>行业代码</th>
+                                <th>所在县市区</th>
+                                <th>所属镇街</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(list,index) in companyList">
+                                <td>{{index+1}}</td>
+                                <td class="comName" @click="companyNewsShow(index,list.UNI_ID,list.NAME)">{{list.NAME}}</td>
+                                <td>{{list.UNI_ID}}</td>
+                                <td>{{list.ENT_INDUSTRY_NAME}}</td>
+                                <td>{{list.ZHFL}}</td>
+                                <td>{{list.ZHFL_LAST}}</td>
+                                <td>{{list.ENT_LAND_NAME}}</td>
+                                <td>{{list.SJ_TDMJ_MU}}</td>
+                                <td>{{list.SJ_SJSS}}</td>
+                                <td>{{list.SJ_YYSR}}</td>
+                                <td>{{list.SJ_LRZE}}</td>
+                                <td>{{list.SJ_ZJZ}}</td>
+                                <td>{{list.SJ_ZGRS}}</td>
+                                <td>{{list.SJ_ZGRS_CB}}</td>
+                                <td>{{list.SJ_YFTR}}</td>
+                                <td>{{list.SJ_YFRS}}</td>
+                                <td>{{list.SJ_FMZL}}</td>
+                                <td>{{list.ZBZ_SSGXD}}</td>
+                                <td>{{list.ZBZ_MJSS}}</td>
+                                <td>{{list.ZBZ_MJZJZ}}</td>
+                                <td>{{list.ZBZ_MJYYSR}}</td>
+                                <td>{{list.ZBZ_JYGXD}}</td>
+                                <td>{{list.ZBZ_LDSCL}}</td>
+                                <td>{{list.ZBZ_YFTR_ZYYWSR}}</td>
+                                <td>{{list.LXR}}</td>
+                                <td>{{list.LXDH}}</td>
+                                <td>{{list.ENT_INDUSTRY_ID}}</td>
+                                <td>{{list.ENT_AREA_NAME}}</td>
+                                <td>{{list.ENT_DEP_NAME}}</td>
+                            </tr>
+                            <tr v-for="num in 18-companyList.length">
+                                <td></td>
+                                <td class="comName"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pageBox" ref="pageBox">
+                    <ul v-if="pages>4">
+                        <li @click='prevPage()'> < </li>
+                        <li :class='selPage==1?"select":""' @click='goPage(1)'>1</li>
+                        <li :class='selPage==2?"select":""' @click='goPage(2)'>2</li>
+                        <li>...</li>
+                        <li :class='selPage==pages?"select":""' @click='goPage(pages)'>{{pages}}</li>
+                        <li @click='nextPage()'> > </li>
+                        <li><input type='text' v-model='selPage'></li>
+                        <li @click='toPage()'>跳转</li>
+                    </ul>
+                    <ul v-else-if="pages>0">
+                        <li @click='prevPage()'> < </li>
+                        <li v-for="index in pages" @click="goPage(index)">{{index}}</li>
+                        <li @click='nextPage()'> > </li>
+                    </ul>
+                    <ul v-else>
+                        <li> < </li>
+                        <li>0</li>
+                        <li> > </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="companyNews" v-if="companyShow">
+            <div class="newsMain">
+                <span @click="companyShow=false">x</span>
+                <div class="headTitle" v-if="companyNews">{{companyNews.basicList[0].entName}}
+                    <button class="cancel" @click="zdShowNews()">企业诊断</button>
+                </div>
+                <div class="mainCenter" v-if="companyNews">
+                    <ul class="companyNewsNav">
+                        <li :class="selConNewsindex==1?'select':''" @click="selConNewsTab(1)">经营情况</li>
+                        <li :class="selConNewsindex==2?'select':''" @click="selConNewsTab(2)">工商登记信息</li>
+                        <li :class="selConNewsindex==3?'select':''" @click="selConNewsTab(3)">最终持股人</li>
+                        <li :class="selConNewsindex==4?'select':''" @click="selConNewsTab(4)">知识产权
+                            <!-- 105100  专利信息查询接口
+                                 105101  商标信息查询接口
+                                 105102  软件著作查询接口 -->
+                        </li>
+                    </ul>
+                    <div class="navMain" v-if="selConNewsindex==1">
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>经营情况</div>
+                            <div class="over">
+                                <table class="center" border="0" cellspacing="0">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="4">基本信息</td>
+                                        </tr>
+                                        <tr>
+                                            <td>公司名称</td>
+                                            <td>111</td>
+                                            <td>成立时间</td>
+                                            <td>111111</td>
+                                        </tr>
+                                        <tr>
+                                            <td>社会统一代码</td>
+                                            <td>11111</td>
+                                            <td>所属行业</td>
+                                            <td>11111</td>
+                                        </tr>
+                                        <tr>
+                                            <td>日常联系人</td>
+                                            <td>11111</td>
+                                            <td>联系人电话</td>
+                                            <td>11111</td>
+                                        </tr>
+                                        <tr>
+                                            <td>当年度评价结果</td>
+                                            <td>A</td>
+                                            <td>上年度评价结果</td>
+                                            <td>11111111</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="navMain" v-if="selConNewsindex==2">
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>照面信息</div>
+                            <table border="0" cellspacing="0">
+                                <tr>
+                                    <td>企业名称</td><td colspan="3">{{companyNews.basicList[0].entName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>法定代表人</td>
+                                    <td>{{companyNews.basicList[0].frName}}</td>
+                                    <td>经营状态</td>
+                                    <td>{{companyNews.basicList[0].enterpriseStatus}}</td>
+                                </tr>
+                                <tr>
+                                    <td>注册号</td>
+                                    <td>{{companyNews.basicList[0].regNo}}</td>
+                                    <td>原注册号</td>
+                                    <td>{{companyNews.basicList[0].oriRegNo}}</td>
+                                </tr>
+                                <tr>
+                                    <td>统一社会信用代码</td>
+                                    <td>{{companyNews.basicList[0].creditCode}}</td>
+                                    <td>企业（机构）类型</td>
+                                    <td>{{companyNews.basicList[0].entType}}</td>
+                                </tr>
+                                <tr>
+                                    <td>注册资本</td>
+                                    <td>{{companyNews.basicList[0].regCap}}</td>
+                                    <td>企业历史名称</td>
+                                    <td>{{companyNews.basicList[0].enterpriseName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>开业日期</td>
+                                    <td>{{companyNews.basicList[0].openFrom}}</td>
+                                    <td>经营期限</td>
+                                    <td>{{companyNews.basicList[0].openTo}}</td>
+                                </tr>
+                                <tr>
+                                    <td>校准日期</td>
+                                    <td>{{companyNews.basicList[0].apprDate}}</td>
+                                    <td>注销/吊销日期</td>
+                                    <td>{{companyNews.basicList[0].revDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td>国民经济行业名称（代码)</td>
+                                    <td>{{companyNews.basicList[0].industryName}}</td>
+                                    <td>行业门类名称</td>
+                                    <td>{{companyNews.basicList[0].industryPhyName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>地址</td>
+                                    <td colspan="3">{{companyNews.basicList[0].entAddress}}</td>
+                                </tr>
+                                <tr>
+                                    <td>登记机关</td>
+                                    <td colspan="3">{{companyNews.basicList[0].regOrg}}</td>
+                                </tr>
+                                <tr>
+                                    <td>组织机构代码</td>
+                                    <td colspan="3">{{companyNews.basicList[0].industryPhyCode}}</td>
+                                </tr>
+                                <tr>
+                                    <td>经营（业务）范围</td>
+                                    <td colspan="3" :title="companyNews.basicList[0].operateScope" class="bigMain">{{companyNews.basicList[0].operateScope}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>股东及出资</div>
+                            <div class="over">
+                                <table class="center" border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>股东</th>
+                                            <th>认缴出资额</th>
+                                            <th>出资比例</th>
+                                            <th>出资日期</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(list,index) in companyNews.shareHolderList">
+                                            <td>{{index+1}}</td>
+                                            <td>{{list.shareholderName}}</td>
+                                            <td>{{list.subConam}}万元</td>
+                                            <td>{{list.fundedRatio}}</td>
+                                            <td>{{list.conDate}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>主要人员</div>
+                            <div class="over">
+                                <table class="center" border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>姓名</th>
+                                            <th>职位</th>
+                                            <th>性别</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(list,index) in companyNews.personList">
+                                            <td>{{index+1}}</td>
+                                            <td>{{list.name}}</td>
+                                            <td>{{list.position}}</td>
+                                            <td>{{list.sex}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>工商变更</div>
+                            <div class="over">
+                                <table class="center left" border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>变更事项</th>
+                                            <th>变更前内容</th>
+                                            <th>变更后内容</th>
+                                            <th>变更时间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(list,index) in companyNews.alterList">
+                                            <td>{{index+1}}</td>
+                                            <td>{{list.altItem}}</td>
+                                            <td :title="list.altBe" class="moddleMain">{{list.altBe}}</td>
+                                            <td :title="list.altAf" class="moddleMain">{{list.altAf}}</td>
+                                            <td>{{list.altDate}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="navMain" v-if="selConNewsindex==3"></div>
+                    <div class="navMain" v-if="selConNewsindex==4">
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>专利信息</div>
+                            <div class="over">
+                                <table class="center" v-if="patentNews!=''&&patentNews.list.length>0" border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th><th>类型</th><th>申请公布日</th><th>名称</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(list,index) in patentNews.list">
+                                            <td>{{index+1}}</td>
+                                            <td>{{list.pdt}}</td>
+                                            <td>{{list.pd.slice(0,10)}}</td>
+                                            <td>{{list.tic}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="center" v-else border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th><th>类型</th><th>申请公布日</th><th>名称</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>商标信息</div>
+                            <div class="over">
+                                <table class="center" v-if="trademarkNews!=''&&trademarkNews.list.length>0" border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th><th>商标</th><th>商标名称</th><th>申请日期</th><th>状态</th><th>注册号</th><th>类型</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(list,index) in trademarkNews.list">
+                                            <td>{{index+1}}</td>
+                                            <td><img :src="list.tmsg" alt=""></td>
+                                            <td>{{list.mno}}</td>
+                                            <td>{{list.fd.slice(0,10)}}</td>
+                                            <td>{{list.cs}}</td>
+                                            <td>{{list.rn}}</td>
+                                            <td>{{list.mk}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="center" v-else border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th><th>商标</th><th>商标名称</th><th>申请日期</th><th>状态</th><th>注册号</th><th>类型</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tableBox">
+                            <div class="companyTitle"><span></span>软件著作权</div>
+                            <div class="over">
+                                <table class="center" v-if="softwareNews.length>0&&softwareNews.list.length>0" border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th><th>软件名称</th><th>软件简称</th><th>登记号</th><th>版本号</th><th>分类号</th><th>登记日期</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(list,index) in softwareNews.list">
+                                            <td>{{index+1}}</td>
+                                            <td>{{list.swfn}}</td>
+                                            <td>{{list.swsn}}</td>
+                                            <td>{{list.rn}}</td>
+                                            <td>{{list.swv}}</td>
+                                            <td>{{list.ctn}}</td>
+                                            <td>{{list.rd.slice(0,10)}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="center" v-else border="0" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th><th>软件名称</th><th>软件简称</th><th>登记号</th><th>版本号</th><th>分类号</th><th>登记日期</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="zdBox" v-if="zdShow">
+            <div class="zdNews">
+                <!-- <div class="zdHead">{{companyNews.basicList[0].entName}}</div>
+                <ul class="newsBox">
+                    <li><span>所属县市</span>{{selCompanyNews.ENT_AREA_NAME}}</li>
+                    <li><span>行业分类</span>{{selCompanyNews.ENT_INDUSTRY_NAME}}</li>
+                    <li><span>再评价结果</span><span class="yellow">{{selCompanyNews.ZHFL_LAST}}</span></li>
+                    <li><span>县市评价结果</span><span class="yellow">{{selCompanyNews.ZHFL}}</span></li>
+                    <li><span>企业性质</span>{{selCompanyNews.ENT_LAND_NAME}}</li>
+                    <li><span>产业分类</span>{{selCompanyNews.ENT_INDUSTRY_PJ_NAME}}</li>
+                </ul>
+                <div class="zdHead">绩效水平</div> -->
+                <table border="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td colspan="6">{{companyNews.basicList[0].entName}}</td>
+                        </tr>
+                    </thead>
+                    <tbody v-if="zdNews.length>0">
+                        <tr>
+                            <td class="title">所属区域（县市区）</td>
+                            <td>{{selCompanyNews.ENT_AREA_NAME}}</td>
+                            <td class="title">土地使用性质</td>
+                            <td>{{selCompanyNews.ENT_LAND_NAME}}</td>
+                            <td class="title">产业分类</td>
+                            <td>{{selCompanyNews.ENT_INDUSTRY_PJ_NAME}}</td>
+                        </tr>
+                        <tr>
+                            <td class="title">县市级评价结果</td>
+                            <td>{{selCompanyNews.ZHFL}}</td>
+                            <td class="title">上年度评价结果</td>
+                            <td>{{selCompanyNews.ZHFL_LAST}}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">绩效水平</td>
+                        </tr>
+                        <tr class="tbHead">
+                            <td rowspan="2">绩效指标</td>
+                            <td rowspan="2">企业绩效</td>
+                            <td colspan="2">行业平均绩效</td>
+                            <td colspan="2">全省平均绩效</td>
+                        </tr>
+                        <tr class="tbHead">
+                            <td>指标</td>
+                            <td>对比</td>
+                            <td>指标</td>
+                            <td>对比</td>
+                        </tr>
+                        <tr v-for="(list,index) in zdNews">
+                            <td class="gary">{{list.ZBMC}}</td>
+                            <td>{{list.ZBZ}}</td>
+                            <td>{{list.CYPJ_ZBZ}}</td>
+                            <td>{{list.CYPJ_ZBZ_DB}}</td>
+                            <td>{{list.QSPJ_ZBZ}}</td>
+                            <td>{{list.QSPJ_ZBZ_DB}}</td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td class="title">所属区域（县市区）</td>
+                            <td>{{selCompanyNews.ENT_AREA_NAME}}</td>
+                            <td class="title">土地使用性质</td>
+                            <td>{{selCompanyNews.ENT_LAND_NAME}}</td>
+                            <td class="title">产业分类</td>
+                            <td>{{selCompanyNews.ENT_INDUSTRY_PJ_NAME}}</td>
+                        </tr>
+                        <tr>
+                            <td class="title">县市级评价结果</td>
+                            <td>{{selCompanyNews.ZHFL}}</td>
+                            <td class="title">上年度评价结果</td>
+                            <td>{{selCompanyNews.ZHFL_LAST}}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="title big">绩效水平</td>
+                        </tr>
+                        <tr class="tbHead">
+                            <td rowspan="2">绩效指标</td>
+                            <td rowspan="2">企业绩效</td>
+                            <td colspan="2">行业平均绩效</td>
+                            <td colspan="2">全省平均绩效</td>
+                        </tr>
+                        <tr class="tbHead">
+                            <td>指标</td>
+                            <td>对比</td>
+                            <td>指标</td>
+                            <td>对比</td>
+                        </tr>
+                        <tr v-for="(list,index) in 7">
+                            <td class="gary"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="closeBtnBox"><button class="close" @click="zdShow=false">关闭</button></div>
+            </div>
+        </div>
+	</div>
+	<script type="text/javascript" src="../js/portraits.js"></script>
+</body>
+</html>
